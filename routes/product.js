@@ -149,6 +149,27 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
+// Supprimer un produit
+router.delete('/:id', async (req, res) => {
+    try {
+        const productId = parseInt(req.params.id);
+
+        // Vérifier si le produit existe
+        const existingProduct = await Product.findByPk(productId);
+
+        if (!existingProduct) {
+            return res.status(404).json({ error: 'Produit non trouvé' });
+        }
+
+        // Supprimer le produit
+        await existingProduct.destroy();
+
+        res.status(200).json({ message: 'Produit supprimé' });
+    } catch (error) {
+        console.log("Erreur lors de la suppression du produit dans la base de données:", error);
+        res.status(500).json({ error: "Erreur lors de la suppression du produit" });
+    }
+});
 
 
 
