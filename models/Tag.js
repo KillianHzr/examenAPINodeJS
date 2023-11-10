@@ -17,4 +17,5 @@ const Tag = sequelize.define('Tag', {
     ]
 })
 
+// Exporter le modèle pour utilisation dans d'autres fichiers
 module.exports = Tag

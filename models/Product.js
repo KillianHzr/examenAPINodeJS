@@ -26,4 +26,5 @@ const Product = sequelize.define('Product', {
     }
 });
 
+// Exporter le modèle pour utilisation dans d'autres fichiers
 module.exports = Product;
