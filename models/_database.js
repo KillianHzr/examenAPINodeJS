@@ -1,5 +1,5 @@
 // Initialisation de la connexion à la BDD
-const Sequelize = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 
 const sequelizeInstance = new Sequelize(
     process.env.DB_NAME,
