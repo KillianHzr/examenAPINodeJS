@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
+const { authenticationMiddleware, ADMINauthenticationMiddleware } = require('../middlewares/auth');
 
 // Importation des modèles Sequelize.
 const { Tag } = require('../models');
 
 // Lister les tags
-router.get('/', async (req, res) =>{
+router.get('/', ADMINauthenticationMiddleware, async (req, res) =>{
     try {
         // Récupérer tous les tags depuis la base de données
         const tags = await Tag.findAll();
@@ -20,7 +21,7 @@ router.get('/', async (req, res) =>{
 });
 
 // Afficher un tag
-router.get('/:id', async (req, res) => {
+router.get('/:id', ADMINauthenticationMiddleware, async (req, res) => {
     const tagId = parseInt(req.params.id);
 
     try {
@@ -42,7 +43,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Ajouter un tag
-router.post('/', async (req, res) => {
+router.post('/', ADMINauthenticationMiddleware, async (req, res) => {
     try {
         // Récupérer le titre du tag depuis le corps de la requête
         const { title } = req.body;
@@ -60,7 +61,7 @@ router.post('/', async (req, res) => {
 });
 
 // Mettre à jour un tag
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', ADMINauthenticationMiddleware, async (req, res) => {
     try {
         // Récupérer l'identifiant du tag et les champs mis à jour depuis les paramètres
         const tagId = parseInt(req.params.id);
@@ -88,7 +89,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // Supprimer un tag
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', ADMINauthenticationMiddleware, async (req, res) => {
     try {
         // Récupérer l'identifiant du tag depuis les paramètres de requête
         const tagId = parseInt(req.params.id);
