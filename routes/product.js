@@ -22,6 +22,7 @@ router.get('/', async (req, res) =>{
             },
             limit: pageSize,
             offset: (page - 1) * pageSize,
+            include: Tag,
         });
 
         // Créer la réponse avec les détails de pagination
@@ -46,12 +47,15 @@ router.get('/:id', async (req, res) => {
     const productId = parseInt(req.params.id);
 
     try {
-        // Récupérer le produit par son identifiant
-        const product = await Product.findByPk(productId);
-
         // Vérifier si le produit existe et le renvoyer au format JSON
-        if (product) {
-            res.status(200).json(product);
+        if (productId) {
+            // Récupérer le produit avec les tags pour la réponse
+            const productWithTags = await Product.findByPk(productId, {
+                include: Tag,
+            });
+    
+            // Renvoyer le produit créé au format JSON
+            res.status(201).json(productWithTags);
         } else {
             // Renvoyer une réponse 404 si le produit n'est pas trouvé
             res.status(404).json({ message: 'Produit non trouvé' });
