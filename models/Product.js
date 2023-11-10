@@ -23,11 +23,7 @@ const Product = sequelize.define('Product', {
         type: DataTypes.INTEGER,
         defaultValue: 0,
         allowNull: true
-    },
-    tags: {
-        type: DataTypes.STRING,
-        allowNull: true
     }
-})
+});
 
-module.exports = Product
+module.exports = Product;
