@@ -4,9 +4,10 @@ const { Op } = require('sequelize');
 const { authenticationMiddleware, ADMINauthenticationMiddleware } = require('../middlewares/auth');
 
 // Importation des modèles Sequelize.
-const { Product, Tag } = require('../models');
+const { Product, Tag, User } = require('../models');
 
 // Lister les produits
+// Filter avec ?tags=tag,tag,tag
 router.get('/', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -23,6 +24,24 @@ router.get('/', async (req, res) => {
             include: Tag,
         });
 
+        // Si des tags sont fournis dans la requête, appliquer le filtre
+        if (req.query.tags) {
+            const tagArray = req.query.tags.split(',');
+            const filteredProducts = await Product.findAll({
+                include: [{
+                    model: Tag,
+                    where: { title: { [Op.in]: tagArray } },
+                    through: { attributes: [] },
+                }],
+            });
+            return res.status(200).json({
+                count: filteredProducts.length,
+                currentPage: page,
+                totalPages: Math.ceil(filteredProducts.length / pageSize),
+                results: filteredProducts,
+            });
+        }
+
         const response = {
             count,
             currentPage: page,
@@ -34,32 +53,6 @@ router.get('/', async (req, res) => {
     } catch (error) {
         console.log("Erreur lors de la récupération des produits depuis la base de données:", error);
         res.status(500).json({ error: "Erreur lors de la récupération des produits" });
-    }
-});
-
-// Récupérer tous les produits avec filtre par tags
-router.get('/filtered', async (req, res) => {
-    try {
-        const { tags } = req.query;
-
-        if (!tags) {
-            return res.status(400).json({ message: 'Les tags sont requis pour filtrer les produits.' });
-        }
-
-        const tagArray = tags.split(',');
-
-        const products = await Product.findAll({
-            include: [{
-                model: Tag,
-                where: { title: { [Op.in]: tagArray } },
-                through: { attributes: [] },
-            }],
-        });
-
-        res.json(products);
-    } catch (error) {
-        console.error('Erreur lors de la récupération des produits filtrés :', error);
-        res.status(500).json({ message: 'Erreur lors de la récupération des produits filtrés' });
     }
 });
 
@@ -183,6 +176,57 @@ router.delete('/:id', ADMINauthenticationMiddleware, async (req, res) => {
         res.status(500).json({ error: "Erreur lors de la suppression du produit" });
     }
 });
+
+
+
+//  todo - PANIER
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  PAS FONCTIONNEL
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Route pour ajouter un produit au panier
+// router.post('/add-to-cart/:productId', authenticationMiddleware, async (req, res) => {
+//     try {
+//         const userId = req.user.id;
+
+//         // Vérifiez si l'utilisateur a déjà un panier
+//         const user = await User.findByPk(userId, { include: 'cart' });
+
+//         let cart;
+//         if (user.cart) {
+//             // Utilisez le panier existant
+//             cart = user.cart;
+//         } else {
+//             // Créez un nouveau panier
+//             cart = await Cart.create();
+//             // Associez le panier à l'utilisateur
+//             await user.setCart(cart);
+//         }
+
+//         // À ce stade, vous avez le panier dans la variable 'cart'
+//         // Vous pouvez ajouter le produit au panier comme vous le faisiez auparavant.
+//         // Assurez-vous d'avoir une association entre 'Product' et 'Cart' pour le faire.
+
+//         const productId = req.params.productId;
+//         const quantity = req.body.quantity || 1;
+
+//         const product = await Product.findByPk(productId);
+
+//         if (product) {
+//             // Ajoutez le produit au panier
+//             await cart.addProduct(product, { through: { quantity } });
+//             res.status(200).json({ message: 'Produit ajouté au panier avec succès.' });
+//         } else {
+//             res.status(404).json({ message: 'Produit non trouvé.' });
+//         }
+//     } catch (error) {
+//         console.error('Erreur lors de l\'ajout au panier :', error);
+//         res.status(500).json({ message: 'Erreur lors de l\'ajout au panier.' });
+//     }
+// });
+
+
+
 
 // Exporter le routeur pour utilisation dans d'autres fichiers
 module.exports = router;
