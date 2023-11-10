@@ -12,7 +12,7 @@ const Product = sequelize.define('Product', {
         allowNull: false
     },
     prix: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL,
         allowNull: false
     },
     description: {
@@ -21,11 +21,12 @@ const Product = sequelize.define('Product', {
     },
     references: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        defaultValue: 0,
+        allowNull: true
     },
     tags: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     }
 })
 

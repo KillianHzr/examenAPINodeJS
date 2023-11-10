@@ -7,13 +7,13 @@ const Tag = sequelize.define('Tag', {
         primaryKey: true,
         autoIncrement: true
     },
-    name: {
+    title: {
         type: DataTypes.STRING,
         allowNull: false
     }
 }, {
     indexes: [
-        {unique: true, fields: ['name']},
+        {unique: true, fields: ['title']},
     ]
 })
 
